@@ -1,3 +1,4 @@
 pyalsaaudio==0.8.2
 PyYAML==3.11
 wheel==0.24.0
+requests==2.8.1

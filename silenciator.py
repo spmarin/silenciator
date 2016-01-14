@@ -17,9 +17,10 @@ import sys
 import os
 import signal
 import logging
+from send_text import send_text
 
 LOG_FILENAME = 'silenciator.log'
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('silenciator')
 logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
 
 
@@ -42,7 +43,7 @@ inp.setformat(alsaaudio.PCM_FORMAT_S16_LE)
 # or 0 bytes of data. The latter is possible because we are in nonblocking
 # mode.
 #inp.setperiodsize(160)
-inp.setperiodsize(3600)
+inp.setperiodsize(4000)
 
 ##### Fin audio ######
 
@@ -73,10 +74,13 @@ def avisa_nivel():
     logger.info("callarse! [%s]" % avisos_n)
     if avisos_n <= 2:
         play(config['n1_wav'])
+        send_text('Silencio')
     elif avisos_n <= 4:
         play(config['n2_wav'])
+        send_text('Silencio por favor')
     else:
         play(config['n3_wav'])
+        send_text('Ya vale, no?')
 
 def avisador():
     """
@@ -107,8 +111,9 @@ if __name__ == '__main__':
             if l:
                 # Return the maximum of the absolute value of all samples in a fragment.
                 max_v = audioop.max(data, 2)
+                avg_v = audioop.avg(data, 2)
                 if counter % config['show'] == 0:
-                    logger.info("Value: %s",max_v)
+                    logger.info("time=%s | Max Value=%s | Average Value=%s", datetime.datetime.utcnow(), max_v, avg_v)
                     counter = 1
                 else:
                     counter += 1
